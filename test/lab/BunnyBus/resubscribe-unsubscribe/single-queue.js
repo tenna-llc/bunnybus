@@ -3,6 +3,8 @@
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
 const BunnyBus = require('../../../../lib');
+const Sinon = require('sinon');
+const WaitForExpect = require('wait-for-expect');
 
 const { describe, before, beforeEach, after, afterEach, it } = (exports.lab = Lab.script());
 const expect = Code.expect;
@@ -83,6 +85,32 @@ describe('BunnyBus', () => {
                     await expect(instance.resubscribe({ queue: baseQueueName })).to.not.reject();
                     await instance.publish({ message: messageObject });
                 });
+            });
+
+            it('should nack all messages back to queue', async () => {
+                const cosnumerSpy = Sinon.spy();
+                const getAllSpy = Sinon.spy();
+
+                // subscribe and consume without ack
+                await instance.subscribe({ queue: baseQueueName, handlers: { [messageObject.event]: cosnumerSpy } });
+                // publish messages
+                const messages = [messageObject, messageObject, messageObject, messageObject, messageObject];
+                await Promise.all(messages.map((message) => instance.publish({ message })));
+
+                // wait for all messages consumed
+                await WaitForExpect(() => expect(cosnumerSpy.callCount).to.equal(messages.length));
+
+                // assert there are no more messages in the queue
+                const hasMessages = await instance.get({ queue: baseQueueName });
+                expect(hasMessages).to.equal(false);
+
+                // unsubscribe and nack
+                await instance.unsubscribe({ queue: baseQueueName, nackMessages: true });
+
+                // assert messages are back in queue
+                await instance.getAll({ queue: baseQueueName, handler: getAllSpy });
+                // wait for all messages consumed
+                await WaitForExpect(() => expect(getAllSpy.callCount).to.equal(messages.length));
             });
         });
     });

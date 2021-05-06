@@ -3,7 +3,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [BunnyBus](#bunnybus)
   - [Constructor](#constructor)
     - [`new BunnyBus([config])`](#new-bunnybusconfig)
@@ -11,7 +10,6 @@
     - [`config`](#config)
     - [`connections`](#connections)
     - [`channels`](#channels)
-    - [`httpClients`](#httpclients)
     - [`subscriptions`](#subscriptions)
     - [`logger`](#logger)
     - [`connectionString`](#connectionstring)
@@ -42,7 +40,7 @@
       - [`handler`](#handler)
     - [`async resubscribe({queue})`](#async-resubscribequeue)
       - [parameter(s)](#parameters-9)
-    - [`async unsubscribe({queue})`](#async-unsubscribequeue)
+    - [`async unsubscribe({queue, nackMessages})`](#async-unsubscribequeue-nackmessages)
       - [parameter(s)](#parameters-10)
     - [`await send({message, queue, [options]})`](#await-sendmessage-queue-options)
       - [note(s)](#notes)
@@ -204,17 +202,8 @@
     - [`ChannelManager.CHANNEL_REMOVED`](#channelmanagerchannel_removed-1)
       - [key value](#key-value-11)
       - [handler parmaeters](#handler-parmaeters-10)
-- [`HttpClientManager`](#httpclientmanager)
-  - [Methods](#methods-3)
-    - [`async create(name, connectionOptions, [socketOptions])`](#async-createname-connectionoptions-socketoptions-1)
-      - [parameter(s)](#parameters-28)
-    - [`contains(name)`](#containsname-2)
-      - [parameter(s)](#parameters-29)
-    - [`get(name)`](#getname-2)
-      - [parameter(s)](#parameters-30)
-    - [`list()`](#list-2)
 - [`SubscriptionManager`](#subscriptionmanager)
-  - [Methods](#methods-4)
+  - [Methods](#methods-3)
     - [`contains(queue, [withConsumerTag])`](#containsqueue-withconsumertag)
     - [`create(queue, handlers, [options])`](#createqueue-handlers-options)
     - [`tag(queue, consumerTag)`](#tagqueue-consumertag)
@@ -222,7 +211,7 @@
     - [`clear(queue)`](#clearqueue)
     - [`clearAll()`](#clearall)
     - [`remove(queue)`](#removequeue)
-    - [`list()`](#list-3)
+    - [`list()`](#list-2)
     - [`block(queue)`](#blockqueue)
     - [`unblock(queue)`](#unblockqueue)
   - [Events](#events-5)
@@ -620,13 +609,14 @@ const bunnyBus = new BunnyBus();
 await bunnyBus.resubscribe({ queue: 'queue1' });
 ```
 
-#### `async unsubscribe({queue})`
+#### `async unsubscribe({queue, nackMessages})`
 
 Unsubscribe active handlers that are listening to a queue.
 
 ##### parameter(s)
 
   * `queue` - the name of the queue. *[string]* **Required**
+  * `nackMessages` - requeue unacknowledged messages. *[boolean]* **Optional** Default `false`
 
 ```javascript
 const BunnyBus = require('bunnybus');
