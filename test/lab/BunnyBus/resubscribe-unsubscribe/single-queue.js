@@ -101,16 +101,15 @@ describe('BunnyBus', () => {
                 await WaitForExpect(() => expect(cosnumerSpy.callCount).to.equal(messages.length));
 
                 // assert there are no more messages in the queue
-                const hasMessages = await instance.get({ queue: baseQueueName });
-                expect(hasMessages).to.equal(false);
+                let state = await instance.checkQueue({ name: baseQueueName });
+                expect(state).to.equal({ queue: baseQueueName, messageCount: 0, consumerCount: 1 });
 
                 // unsubscribe and nack
                 await instance.unsubscribe({ queue: baseQueueName, nackMessages: true });
 
-                // assert messages are back in queue
-                await instance.getAll({ queue: baseQueueName, handler: getAllSpy });
-                // wait for all messages consumed
-                await WaitForExpect(() => expect(getAllSpy.callCount).to.equal(messages.length));
+                // assert messages are back in queue and no more consumers
+                state = await instance.checkQueue({ name: baseQueueName });
+                expect(state).to.equal({ queue: baseQueueName, messageCount: messages.length, consumerCount: 0 });
             });
         });
     });
