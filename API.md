@@ -61,6 +61,8 @@
       - [`parameter(s)`](#parameters-2)
     - [`async _reject({payload, channelName, [errorQueue]}, [options])`](#async-_rejectpayload-channelname-errorqueue-options)
       - [`parameter(s)`](#parameters-3)
+    - [`async _nack({payload, channelName}})`](#async-_nackpayload-channelname)
+      - [`parameter(s)`](#parameters-4)
   - [Events](#events)
   - [`BunnyBus.LOG_DEBUG_EVENT`](#bunnybuslog_debug_event)
     - [event key](#event-key)
@@ -572,7 +574,9 @@ A `handler` is an asynchronous function which contains the following arity.  Ord
     * `option` *[Object]* **Optional**
       * `reason` - A string that should describe the reason the message is being rejcted *[String]* **Optional**
       * `errorQueue` - A string for a specific error queue that the message should be routed to. *[String]* **Optional**
-  * `async requeue()` is an async function for requeuing the message back to the back of the queue.  This is feature circumvents Rabbit's `nack` RPC.  `nack` natively requeues but pushes the message to the front of the queue.
+  * `async requeue()` is an async function for requeuing the message back to the back of the queue.  This is feature circumvents Rabbit's `nack` RPC.  `nack` natively 
+  requeues but pushes the message to the front of the queue.
+  * `async nack()` is an async function for negatively acknowledging the message back to the queue.
 
 ```javascript
 const BunnyBus = require('bunnybus');
@@ -582,10 +586,14 @@ const handlers = {
     route.event1 : async ({message, metaData, ack, rej, requeue}) => {
         await ack();
     },
-    route.event2 : async ({message, metaData, ack, rej, requeue}) => {
+    route.event2 : async ({message, metaData, ack, rej, requeue, nack}) => {
         if (//something not ready) {
             await requeue();
-        } else {
+        } else if (// oh snap!) {
+            // returning to queue
+            await nack()
+        }          
+        else {
             await ack();
         }
     }
@@ -848,6 +856,35 @@ await bunnyBus.subscribe({ queue: 'queue1' : handlers: {
 }});
 ```
 
+#### `async _nack({payload, channelName}})`
+
+The negative acknowledge method for returning a message back to the queue.  Mainly used in handlers through `bind()` parameter injection for methods like [`subscribe`](#async-subscribequeue-handlers-options).
+
+##### `parameter(s)`
+
+* `payload` - raw payload from an AMQP result message response. *[Object]* **Required**
+* `channelName` - the originating channel the payload came from. *[string]* **Required**
+
+```javascript
+const BunnyBus = require('bunnybus');
+const bunnyBus = new BunnyBus();
+
+const payload = await bunnyBus.get({ queue: 'queue1' });
+await bunnyBus.nack({ payload, channelName: 'channelForQueue1' });
+```
+
+When supplied through the handler
+
+```javascript
+const BunnyBus = require('bunnybus');
+const bunnyBus = new BunnyBus();
+
+await bunnyBus.subscribe({ queue: 'queue1' : handlers: {
+    'topicA': async ({message, ack, rej, requeue, nack}) => {
+        await nack();
+    }
+}});
+```
 ### Events
 
 `BunnyBus` extends `EventEmitter` for emitting logs and system specific events.  Subscription to these events is optional.  `BunnyBus` class also exposes static Getter properties for the name of these public events.

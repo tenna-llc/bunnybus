@@ -36,7 +36,7 @@
     },
     "dependencies": {
         "@hapi/hoek": "^9.x",
-        "amqplib": "^0.7.x",
+        "amqplib": "^0.8.x",
         "denque": "^1.x",
         "set-interval-async": "^2.x"
     },
@@ -52,7 +52,7 @@
         "jest": "^26.x",
         "nyc": "^15.x",
         "prettier": "^2.x",
-        "sinon": "^10.x",
+        "sinon": "11.x",
         "wait-for-expect": "^3.x"
     }
 }
