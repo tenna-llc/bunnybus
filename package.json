@@ -45,6 +45,7 @@
         "@hapi/eslint-config-hapi": "^13.x",
         "@hapi/eslint-plugin-hapi": "^4.x",
         "@hapi/lab": "^24.x",
+        "@hapi/wreck": "^17.0.0",
         "doctoc": "*",
         "eslint": "^7.x",
         "eslint-config-prettier": "^8.x",
