@@ -52,6 +52,8 @@ const assertSend = async (instance, channelContext, message, queueName, transact
     }
 
     await channelContext.channel.ack(result);
+
+    return { result };
 };
 
 module.exports = assertSend;
