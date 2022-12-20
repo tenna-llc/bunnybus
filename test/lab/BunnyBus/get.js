@@ -44,7 +44,8 @@ describe('BunnyBus', () => {
             });
 
             after(async () => {
-                channelContext.channel && (await channelContext.channel.deleteQueue(baseQueueName));
+                console.dir(channelContext);
+                await channelContext.channel.deleteQueue(baseQueueName);
                 await instance.stop();
             });
 
