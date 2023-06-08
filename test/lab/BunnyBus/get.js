@@ -32,8 +32,7 @@ describe('BunnyBus', () => {
                 },
                 fields: {
                     fabri: 'kan'
-                },
-                expiration: new Date().getTime()
+                }
             };
 
             beforeEach(async () => {
