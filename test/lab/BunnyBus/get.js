@@ -21,7 +21,7 @@ describe('BunnyBus', () => {
         channelManager = instance.channels;
     });
 
-    describe.skip('public methods', () => {
+    describe('public methods', () => {
         describe('get', () => {
             const baseChannelName = 'bunnybus-get';
             const baseQueueName = 'test-get-queue';
@@ -32,8 +32,7 @@ describe('BunnyBus', () => {
                 },
                 fields: {
                     fabri: 'kan'
-                },
-                expiration: new Date().getTime()
+                }
             };
 
             beforeEach(async () => {
