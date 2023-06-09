@@ -42,7 +42,7 @@ describe('BunnyBus', () => {
         });
 
         describe('automatic recovery cases', () => {
-            it.skip('should correctly recover consumer', { timeout: 5000 }, async () => {
+            it('should correctly recover consumer', { timeout: 5000 }, async () => {
                 const targetChannelName = BunnyBus.QUEUE_CHANNEL_NAME(baseQueueName);
                 const message = { event: 'test-event', hello: 'world' };
                 const handlers = {};
@@ -59,7 +59,7 @@ describe('BunnyBus', () => {
 
                 const recoveryPromise = new Promise(async (resolve) => {
                     instance.once(BunnyBus.RECOVERED_CHANNEL_EVENT, (channelName) => {
-                        const result = Object.keys(channelManager.get(targetChannelName).channel.consumers).length;
+                        const result = channelManager.get(targetChannelName).channel.consumers.size;
 
                         expect(channelName).to.equal(targetChannelName);
                         expect(result).to.be.at.least(1);

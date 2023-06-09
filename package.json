@@ -35,7 +35,7 @@
         "url": "https://github.com/tenna-llc/bunnybus"
     },
     "dependencies": {
-        "@hapi/hoek": "10.x",
+        "@hapi/hoek": "11.x",
         "amqplib": "0.10.x",
         "denque": "2.x",
         "set-interval-async": "3.x"
