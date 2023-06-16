@@ -95,6 +95,26 @@ describe('BunnyBus', () => {
 
                 await Assertions.assertSend(instance, channelContext, message, baseQueueName, null, null, null, null);
             });
+
+            it('should proxy custom headers', async () => {
+                await channelManager.close(BunnyBus.QUEUE_CHANNEL_NAME(baseQueueName));
+
+                const miscOptions = {
+                    headers: { retryCount: 1 }
+                };
+                const { result } = await Assertions.assertSend(
+                    instance,
+                    channelContext,
+                    message,
+                    baseQueueName,
+                    null,
+                    null,
+                    null,
+                    miscOptions
+                );
+
+                expect(result.properties.headers.retryCount).to.be.equal(1);
+            });
         });
     });
 });
