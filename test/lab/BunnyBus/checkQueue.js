@@ -101,6 +101,22 @@ describe('BunnyBus', () => {
                     channelManager
                 );
             });
+
+            it('should not leak event listeners', async () => {
+                await channelContext.channel.assertQueue(baseQueueName, BunnyBus.DEFAULT_QUEUE_CONFIGURATION);
+
+                const mgmtChannelContext = await instance._autoBuildChannelContext({
+                    channelName: BunnyBus.MANAGEMENT_CHANNEL_NAME()
+                });
+                const promises = [];
+
+                for (let i = 0; i < 15; ++i) promises.push(instance.checkQueue({ name: baseQueueName }));
+
+                await Promise.all(promises);
+                const listeners = mgmtChannelContext.rawListeners('amqp.channel.close');
+                // should have the main listener
+                expect(listeners.length).to.equal(1);
+            });
         });
     });
 });
