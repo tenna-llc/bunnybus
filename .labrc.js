@@ -7,5 +7,5 @@ module.exports = {
     'coverage-exclude': ['jest.config.js', 'test/jest/cleanup.test.js'],
     threshold: 90,
     lint: true,
-    verbose: true,
+    verbose: true
 };
