@@ -8,5 +8,4 @@ module.exports = {
     threshold: 90,
     lint: true,
     verbose: true,
-    globals: 'Symbol(undici.globalDispatcher.1)'
 };
