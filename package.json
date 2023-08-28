@@ -28,7 +28,7 @@
     "author": "Lam Chan",
     "license": "BSD-3-Clause",
     "engines": {
-        "node": ">=16"
+        "node": ">=16 <=20"
     },
     "repository": {
         "type": "git",
@@ -47,11 +47,11 @@
         "@hapi/wreck": "18.x",
         "doctoc": "*",
         "eslint": "8.x",
-        "eslint-config-prettier": "8.x",
-        "eslint-plugin-prettier": "4.x",
+        "eslint-config-prettier": "9.x",
+        "eslint-plugin-prettier": "5.x",
         "jest": "29.x",
         "nyc": "15.x",
-        "prettier": "2.x",
+        "prettier": "3.x",
         "sinon": "15.x",
         "wait-for-expect": "3.x"
     }
