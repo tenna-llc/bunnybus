@@ -52,7 +52,7 @@
         "jest": "29.x",
         "nyc": "15.x",
         "prettier": "3.x",
-        "sinon": "15.x",
+        "sinon": "16.x",
         "wait-for-expect": "3.x"
     }
 }
