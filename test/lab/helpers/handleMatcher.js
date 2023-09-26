@@ -32,6 +32,7 @@ describe('Helpers', () => {
 
             expect(result).to.be.an.array();
             expect(result).to.have.length(1);
+            expect(result[0]).to.equal({ handler: handlers['world.hello'], topic: 'world.hello' });
         });
 
         it('should match multiple handlers', () => {
@@ -45,6 +46,7 @@ describe('Helpers', () => {
 
             expect(result).to.be.an.array();
             expect(result).to.have.length(1);
+            expect(result[0]).to.equal({ handler: handlers['abc.#.xyz'], topic: 'abc.#.xyz' });
         });
     });
 });

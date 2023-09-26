@@ -9,15 +9,12 @@ jobs:
   test:
     name: Run Test Suite
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [ '12', '14' ]
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 18
           registry-url: https://npm.pkg.github.com/
           scope: '@tenna-llc'
       - run: npm run start-docker
@@ -33,10 +30,10 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 18
           registry-url: https://npm.pkg.github.com/
           scope: '@tenna-llc'
       - run: npm i

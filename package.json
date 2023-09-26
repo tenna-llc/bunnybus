@@ -1,6 +1,6 @@
 {
     "name": "@tenna-llc/bunnybus",
-    "version": "7.3.2",
+    "version": "8.0.0-5",
     "description": "RabbitMQ driver for pub/sub with error queue / retry management",
     "keywords": [
         "bunnybus",
@@ -28,32 +28,31 @@
     "author": "Lam Chan",
     "license": "BSD-3-Clause",
     "engines": {
-        "node": "12.x.x || 14.x.x"
+        "node": ">=16 <=20"
     },
     "repository": {
         "type": "git",
         "url": "https://github.com/tenna-llc/bunnybus"
     },
     "dependencies": {
-        "@hapi/hoek": "^9.x",
-        "amqplib": "^0.8.x",
-        "denque": "^1.x",
-        "set-interval-async": "^2.x"
+        "@hapi/hoek": "11.x",
+        "amqplib": "0.10.x",
+        "denque": "2.x",
+        "set-interval-async": "3.x"
     },
     "devDependencies": {
-        "@hapi/code": "^8.x",
-        "@hapi/eslint-config-hapi": "^13.x",
-        "@hapi/eslint-plugin-hapi": "^4.x",
-        "@hapi/lab": "^24.x",
-        "@hapi/wreck": "^17.0.0",
+        "@hapi/code": "9.x",
+        "@hapi/eslint-plugin": "6.x",
+        "@hapi/lab": "25.x",
+        "@hapi/wreck": "18.x",
         "doctoc": "*",
-        "eslint": "^7.x",
-        "eslint-config-prettier": "^8.x",
-        "eslint-plugin-prettier": "^3.x",
-        "jest": "^26.x",
-        "nyc": "^15.x",
-        "prettier": "^2.x",
-        "sinon": "11.x",
-        "wait-for-expect": "^3.x"
+        "eslint": "8.x",
+        "eslint-config-prettier": "9.x",
+        "eslint-plugin-prettier": "5.x",
+        "jest": "29.x",
+        "nyc": "15.x",
+        "prettier": "3.x",
+        "sinon": "16.x",
+        "wait-for-expect": "3.x"
     }
 }
