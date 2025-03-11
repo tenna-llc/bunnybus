@@ -13,9 +13,10 @@ describe('state management', () => {
     describe('Connection Manager', () => {
         let instance = undefined;
         let defaultConfiguration = undefined;
+        const logger = { info: (...args) => console.log(...args), error: (...args) => console.error(...args) };
 
         beforeEach(() => {
-            instance = new ConnectionManager();
+            instance = new ConnectionManager({ logger });
             defaultConfiguration = BunnyBus.DEFAULT_SERVER_CONFIGURATION;
         });
 
@@ -23,7 +24,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-createConnection';
 
             it('should create a connection with default values', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 const result = instance._connections.get(baseConnectionName);
 
@@ -36,7 +37,7 @@ describe('state management', () => {
             });
 
             it('should create a connection with defaults values while supplied with empty net/tls options', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration, {});
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration, socketOptions: {} });
 
                 const result = instance._connections.get(baseConnectionName);
 
@@ -49,8 +50,10 @@ describe('state management', () => {
             });
 
             it('should create a connection with defaults values while supplied with partially filled net/tls options', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration, {
-                    allowHalfOpen: true
+                await instance.create({
+                    name: baseConnectionName,
+                    connectionOptions: defaultConfiguration,
+                    socketOptions: { allowHalfOpen: true }
                 });
 
                 const result = instance._connections.get(baseConnectionName);
@@ -65,8 +68,8 @@ describe('state management', () => {
 
             it('should return same connection when request are called concurrently', async () => {
                 const [result1, result2] = await Promise.all([
-                    instance.create(baseConnectionName, defaultConfiguration),
-                    instance.create(baseConnectionName, defaultConfiguration)
+                    instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration }),
+                    instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration })
                 ]);
 
                 expect(result1).to.exist();
@@ -75,8 +78,8 @@ describe('state management', () => {
             });
 
             it('should return same connection when request are called sequentially', async () => {
-                const result1 = await instance.create(baseConnectionName, defaultConfiguration);
-                const result2 = await instance.create(baseConnectionName, defaultConfiguration);
+                const result1 = await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
+                const result2 = await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 expect(result1).to.exist();
                 expect(result2).to.exist();
@@ -88,7 +91,7 @@ describe('state management', () => {
                 let sut = null;
 
                 try {
-                    await instance.create(baseConnectionName);
+                    await instance.create({ name: baseConnectionName });
                 } catch (err) {
                     sut = err;
                 }
@@ -101,9 +104,9 @@ describe('state management', () => {
                 let sut = null;
 
                 try {
-                    await instance.create(baseConnectionName, {
-                        port: 60000,
-                        connectionRetryCount: 1
+                    await instance.create({
+                        name: baseConnectionName,
+                        connectionOptions: { port: 60000, connectionRetryCount: 1 }
                     });
                 } catch (err) {
                     sut = err;
@@ -118,7 +121,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-containsConnection';
 
             it('should return true when connection context exist', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 const result = instance.contains(baseConnectionName);
 
@@ -126,7 +129,7 @@ describe('state management', () => {
             });
 
             it('should return false when connection context does not exist', async () => {
-                const result = instance.contains(baseConnectionName);
+                const result = instance.contains({ name: baseConnectionName });
 
                 expect(result).to.be.false();
             });
@@ -136,7 +139,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-getConnection';
 
             it('should return a connection context when it exist', async () => {
-                const connectionContext = await instance.create(baseConnectionName, defaultConfiguration);
+                const connectionContext = await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 const result = instance.get(baseConnectionName);
 
@@ -147,7 +150,7 @@ describe('state management', () => {
             });
 
             it('should be undefined when the connection context does not exist', async () => {
-                const result = instance.get(baseConnectionName);
+                const result = instance.get({ name: baseConnectionName });
 
                 expect(result).to.not.exist();
                 expect(result).to.be.undefined();
@@ -161,7 +164,7 @@ describe('state management', () => {
                 for (let i = 1; i <= 3; ++i) {
                     const connectionName = `${baseConnectionName}-${i}`;
 
-                    await instance.create(connectionName, defaultConfiguration);
+                    await instance.create({ name: connectionName, connectionOptions: defaultConfiguration });
                 }
 
                 const results = instance.list();
@@ -174,7 +177,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-healthy';
 
             it('should be true when connection is in context', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 const result = instance.healthy;
 
@@ -182,7 +185,7 @@ describe('state management', () => {
             });
 
             it('should be true when connection is missing from context but still within the timeout and retry duration limits', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
                 await instance.close(baseConnectionName);
 
                 const result = instance.healthy;
@@ -192,9 +195,15 @@ describe('state management', () => {
 
             it('should be false when connection is missing from context but outside the timeout and retry duration limits', async () => {
                 try {
-                    await Helpers.timeoutAsync(instance.create.bind(instance), 10)(baseConnectionName, {
-                        ...defaultConfiguration,
-                        ...{ timeout: 10, connectionRetryCount: 1 }
+                    await Helpers.timeoutAsync(
+                        instance.create.bind(instance),
+                        10
+                    )({
+                        name: baseConnectionName,
+                        connectionOptions: {
+                            ...defaultConfiguration,
+                            ...{ timeout: 10, connectionRetryCount: 1 }
+                        }
                     });
                 } catch (err) {}
 
@@ -213,7 +222,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-hasConnectionConnection';
 
             it('should be true when connection exist', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 const result = instance.hasConnection(baseConnectionName);
 
@@ -231,7 +240,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-getConnectionConnection';
 
             it('should return a connection when it exist', async () => {
-                const connectionContext = await instance.create(baseConnectionName, defaultConfiguration);
+                const connectionContext = await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 const result = instance.getConnection(baseConnectionName);
 
@@ -251,7 +260,7 @@ describe('state management', () => {
             const baseConnectionName = 'connection-closeConnection';
 
             it('should close connection when it exist', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 await instance.close(baseConnectionName);
 
@@ -272,7 +281,7 @@ describe('state management', () => {
             const baseConnectionName = 'connetion-removeConnection';
 
             it('should remove connection when it exist', async () => {
-                await instance.create(baseConnectionName, defaultConfiguration);
+                await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
 
                 await instance.remove(baseConnectionName);
 
@@ -292,7 +301,7 @@ describe('state management', () => {
             let connectionContext = undefined;
 
             beforeEach(async () => {
-                connectionContext = await instance.create(baseConnectionName, defaultConfiguration);
+                connectionContext = await instance.create({ name: baseConnectionName, connectionOptions: defaultConfiguration });
             });
 
             it('should emit AMQP_CONNECTION_CLOSE_EVENT when connection closes', async () => {

@@ -6,6 +6,7 @@ const { ChannelManager } = require('../../../lib/states');
 const Helpers = require('../../../lib/helpers');
 const BunnyBus = require('../../../lib');
 const { assertConvertToBuffer } = require('../assertions');
+const { queue } = require('../../../lib/helpers/defaultConfiguration');
 
 const { describe, after, before, beforeEach, it } = (exports.lab = Lab.script());
 const expect = Code.expect;
@@ -94,10 +95,10 @@ describe('BunnyBus', () => {
 
                     expect(connectionManager.get(BunnyBus.DEFAULT_CONNECTION_NAME)).to.be.undefined();
 
-                    connectionContext = await connectionManager.create(
-                        BunnyBus.DEFAULT_CONNECTION_NAME,
-                        BunnyBus.DEFAULT_SERVER_CONFIGURATION
-                    );
+                    connectionContext = await connectionManager.create({
+                        name: BunnyBus.DEFAULT_CONNECTION_NAME,
+                        connectionOptions: BunnyBus.DEFAULT_SERVER_CONFIGURATION
+                    });
 
                     expect(connectionManager.get(BunnyBus.DEFAULT_CONNECTION_NAME)).to.exist();
                     expect(channelManager.get(baseChannelName)).to.be.undefined();
@@ -142,16 +143,15 @@ describe('BunnyBus', () => {
                     expect(connectionManager.get(BunnyBus.DEFAULT_CONNECTION_NAME)).to.be.undefined();
                     expect(channelManager.get(baseChannelName)).to.be.undefined();
 
-                    connectionContext = await connectionManager.create(
-                        BunnyBus.DEFAULT_CONNECTION_NAME,
-                        BunnyBus.DEFAULT_SERVER_CONFIGURATION
-                    );
-                    channelContext = await channelManager.create(
-                        baseChannelName,
-                        null,
+                    connectionContext = await connectionManager.create({
+                        name: BunnyBus.DEFAULT_CONNECTION_NAME,
+                        connectionOptions: BunnyBus.DEFAULT_SERVER_CONFIGURATION
+                    });
+                    channelContext = await channelManager.create({
+                        name: baseChannelName,
                         connectionContext,
-                        BunnyBus.DEFAULT_SERVER_CONFIGURATION
-                    );
+                        channelOptions: BunnyBus.DEFAULT_SERVER_CONFIGURATION
+                    });
 
                     expect(connectionManager.get(BunnyBus.DEFAULT_CONNECTION_NAME)).to.exist();
                     expect(channelManager.get(baseChannelName)).to.exist();
