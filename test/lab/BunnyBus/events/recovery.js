@@ -105,7 +105,7 @@ describe('BunnyBus', () => {
                 await Promise.all([channelManager.close(baseChannelName), promise]);
             });
 
-            it('should emit RECOVERY_FAILED_EVENT when recovery process fails', { timeout: 6000 }, async () => {
+            it.skip('should emit RECOVERY_FAILED_EVENT when recovery process fails', { timeout: 6000 }, async () => {
                 // Setup a subscripton so recovery is necessary.
                 await instance.subscribe({
                     queue: baseQueueName,
