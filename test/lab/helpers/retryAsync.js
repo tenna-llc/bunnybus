@@ -17,20 +17,24 @@ describe('Helpers', () => {
 
         it('should run once', async () => {
             expect(
-                await Helpers.retryAsync(async () => {
-                    return ++i;
+                await Helpers.retryAsync({
+                    asyncFunc: async () => {
+                        return ++i;
+                    }
                 })
             ).to.equal(1);
         });
 
         it('should run twice with no errors', async () => {
             expect(
-                await Helpers.retryAsync(async () => {
-                    if (++i < 2) {
-                        throw new Error();
-                    }
+                await Helpers.retryAsync({
+                    asyncFunc: async () => {
+                        if (++i < 2) {
+                            throw new Error();
+                        }
 
-                    return i;
+                        return i;
+                    }
                 })
             ).to.equal(2);
         });
@@ -43,20 +47,26 @@ describe('Helpers', () => {
             let y = 0;
 
             await Promise.all([
-                Helpers.retryAsync(async () => {
-                    if (++x < 2) {
-                        throw new Error();
-                    }
+                Helpers.retryAsync({
+                    asyncFunc: async () => {
+                        if (++x < 2) {
+                            throw new Error();
+                        }
 
-                    endTimeX = new Date();
-                }, 100),
-                Helpers.retryAsync(async () => {
-                    if (++y < 2) {
-                        throw new Error();
-                    }
+                        endTimeX = new Date();
+                    },
+                    interval: 100
+                }),
+                Helpers.retryAsync({
+                    asyncFunc: async () => {
+                        if (++y < 2) {
+                            throw new Error();
+                        }
 
-                    endTimeY = new Date();
-                }, 1000)
+                        endTimeY = new Date();
+                    },
+                    interval: 1000
+                })
             ]);
 
             const diffTimeX = endTimeX.getTime() - startTime.getTime();
@@ -68,19 +78,19 @@ describe('Helpers', () => {
         it('should run with interval supplied as a function', async () => {
             let dynamicIntervalResult = 0;
 
-            const result = await Helpers.retryAsync(
-                async () => {
+            const result = await Helpers.retryAsync({
+                asyncFunc: async () => {
                     if (++i < 3) {
                         throw new Error();
                     }
 
                     return i;
                 },
-                (retryCount) => {
+                interval: (retryCount) => {
                     dynamicIntervalResult = 50 * Math.pow(2, retryCount);
                     return dynamicIntervalResult;
                 }
-            );
+            });
 
             expect(result).to.equal(3);
             expect(dynamicIntervalResult).to.equal(200);
@@ -90,14 +100,14 @@ describe('Helpers', () => {
             let result = null;
 
             try {
-                await Helpers.retryAsync(
-                    async () => {
+                await Helpers.retryAsync({
+                    asyncFunc: async () => {
                         ++i;
                         throw new Error();
                     },
-                    100,
-                    2
-                );
+                    interval: 100,
+                    times: 2
+                });
             } catch (err) {
                 result = err;
             }
@@ -110,16 +120,16 @@ describe('Helpers', () => {
             let result = null;
 
             try {
-                await Helpers.retryAsync(
-                    async () => {
+                await Helpers.retryAsync({
+                    asyncFunc: async () => {
                         throw new Error();
                     },
-                    100,
-                    2,
-                    () => {
+                    interval: 100,
+                    times: 2,
+                    errorFilterFunc: () => {
                         return true;
                     }
-                );
+                });
             } catch (err) {
                 result = err;
             }
