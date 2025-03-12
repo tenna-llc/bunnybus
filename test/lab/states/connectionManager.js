@@ -13,7 +13,11 @@ describe('state management', () => {
     describe('Connection Manager', () => {
         let instance = undefined;
         let defaultConfiguration = undefined;
-        const logger = { info: (...args) => console.log(...args), error: (...args) => console.error(...args) };
+        const logger = {
+            info: (...args) => console.log(...args),
+            warn: (...args) => console.log(...args),
+            error: (...args) => console.error(...args)
+        };
 
         beforeEach(() => {
             instance = new ConnectionManager({ logger });

@@ -17,7 +17,11 @@ describe('state management', () => {
         let connectionContext = undefined;
         let defaultConfiguration = undefined;
         const baseConnectionName = 'channel-baseConnection';
-        const logger = { info: (...args) => console.log(...args), error: (...args) => console.error(...args) };
+        const logger = {
+            info: (...args) => console.log(...args),
+            warn: (...args) => console.log(...args),
+            error: (...args) => console.error(...args)
+        };
 
         beforeEach(async () => {
             defaultConfiguration = BunnyBus.DEFAULT_SERVER_CONFIGURATION;
