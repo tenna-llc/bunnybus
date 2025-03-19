@@ -33,7 +33,12 @@ const autoRecoverChannel = async (testFuncAsync, connectionContext, channelConte
             throw err;
         }
     } finally {
-        await channelManager.create(channelContext.name, queue, channelContext.connectionContext, channelContext.channelOptions);
+        await channelManager.create({
+            name: channelContext.name,
+            queue,
+            connectionContext: channelContext.connectionContext,
+            channelOptions: channelContext.channelOptions
+        });
     }
 };
 

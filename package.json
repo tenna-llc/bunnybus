@@ -1,6 +1,6 @@
 {
     "name": "@tenna-llc/bunnybus",
-    "version": "8.0.0",
+    "version": "8.0.2-8",
     "description": "RabbitMQ driver for pub/sub with error queue / retry management",
     "keywords": [
         "bunnybus",
@@ -23,7 +23,7 @@
         "lint": "eslint ./",
         "lint-fix": "eslint --fix ./",
         "lint-fix-dry-run": "eslint --fix-dry-run ./",
-        "test-coverage": "nyc --reporter=lcov lab test/lab --r lcov -S"
+        "test-coverage": "npx nyc --reporter=lcov lab test/lab --r lcov -S"
     },
     "author": "Lam Chan",
     "license": "BSD-3-Clause",
@@ -50,9 +50,8 @@
         "eslint-config-prettier": "9.x",
         "eslint-plugin-prettier": "5.x",
         "jest": "29.x",
-        "nyc": "15.x",
         "prettier": "3.x",
-        "sinon": "16.x",
+        "sinon": "19.x",
         "wait-for-expect": "3.x"
     }
 }
